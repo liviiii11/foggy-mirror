@@ -42,8 +42,12 @@ export default function HandTracker({ videoRef, active, onTip, onStatus }) {
               const aspect = v.videoWidth / v.videoHeight; // x and y are normalized separately
               const dist = (a, b) => Math.hypot((a.x - b.x) * aspect, a.y - b.y);
               const ratio = dist(L[4], L[8]) / dist(L[0], L[9]); // thumb-index gap vs hand size
-              pinching = pinching ? ratio < 0.5 : ratio < 0.3;   // start tight, release looser
-              onTip({
+              // A finger counts as "open" when its tip is farther from the wrist than its middle joint.
+              const open = (tip, pip) => dist(L[tip], L[0]) > dist(L[pip], L[0]);
+              const othersOpen = [[12, 10], [16, 14], [20, 18]].filter(([t, p]) => open(t, p)).length;
+              const notFist = othersOpen >= 2; // middle, ring, pinky: at least 2 must be open
+              const pinched = pinching ? ratio < 0.5 : ratio < 0.3; // start tight, release looser
+              pinching = pinched && notFist;              onTip({
                 x: (L[4].x + L[8].x) / 2,
                 y: (L[4].y + L[8].y) / 2,
                 pinching,
