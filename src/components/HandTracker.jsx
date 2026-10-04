@@ -3,14 +3,16 @@ import { FilesetResolver, HandLandmarker } from "@mediapipe/tasks-vision";
 
 const WASM = "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.14/wasm";
 const MODEL = "https://storage.googleapis.com/mediapipe-models/hand_landmarker/hand_landmarker/float16/1/hand_landmarker.task";
-const INDEX_TIP = 8; // MediaPipe landmark id for the index fingertip
 
-// Headless: runs detection each frame, reports the fingertip in video-normalized
-// coords (0..1, un-mirrored) or null if no hand is visible.
+// Landmarks: 4 = thumb tip, 8 = index tip, 0 = wrist, 9 = middle knuckle.
+// Headless: runs detection each frame, reports the pencil point (midpoint of
+// thumb and index tips, video-normalized 0..1, un-mirrored) plus whether the
+// fingers are pinched. Reports null if no hand is visible.
 export default function HandTracker({ videoRef, active, onTip, onStatus }) {
   useEffect(() => {
     if (!active) return;
     let raf, landmarker, stopped = false, lastTime = -1;
+    let pinching = false; // remembered between frames so the line doesn't flicker
 
     (async () => {
       try {
@@ -31,8 +33,22 @@ export default function HandTracker({ videoRef, active, onTip, onStatus }) {
           if (v && v.readyState >= 2 && v.currentTime !== lastTime) {
             lastTime = v.currentTime;
             const res = landmarker.detectForVideo(v, performance.now());
-            const p = res.landmarks?.[0]?.[INDEX_TIP];
-            onTip(p ? { x: p.x, y: p.y } : null);
+            const L = res.landmarks?.[0];
+
+            if (!L) {
+              pinching = false;
+              onTip(null);
+            } else {
+              const aspect = v.videoWidth / v.videoHeight; // x and y are normalized separately
+              const dist = (a, b) => Math.hypot((a.x - b.x) * aspect, a.y - b.y);
+              const ratio = dist(L[4], L[8]) / dist(L[0], L[9]); // thumb-index gap vs hand size
+              pinching = pinching ? ratio < 0.5 : ratio < 0.3;   // start tight, release looser
+              onTip({
+                x: (L[4].x + L[8].x) / 2,
+                y: (L[4].y + L[8].y) / 2,
+                pinching,
+              });
+            }
           }
           raf = requestAnimationFrame(loop);
         };

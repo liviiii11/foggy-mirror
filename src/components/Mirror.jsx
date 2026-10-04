@@ -34,7 +34,8 @@ export default function Mirror() {
     smooth.current = s ? { x: s.x + (b.x - s.x) * 0.5, y: s.y + (b.y - s.y) * 0.5 } : { x: b.x, y: b.y };
     const { x, y } = smooth.current;
     dot.style.opacity = 1; dot.style.transform = `translate(${x}px, ${y}px)`;
-    if (x >= 0 && y >= 0 && x <= b.w && y <= b.h) fogRef.current.wipe(x / b.w, y / b.h);
+    dot.classList.toggle("down", p.pinching);
+    if (p.pinching && x >= 0 && y >= 0 && x <= b.w && y <= b.h) fogRef.current.wipe(x / b.w, y / b.h);
     else fogRef.current.lift();
   };
 

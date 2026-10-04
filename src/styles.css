@@ -23,6 +23,7 @@ body{font-family:"Fredoka",system-ui,sans-serif;color:var(--ink);background:radi
 .s1{top:9%;left:8%}.s2{top:14%;right:10%;animation-delay:1s}.s3{bottom:18%;right:14%;animation-delay:2s}
 @keyframes tw{50%{opacity:.25;transform:scale(.7)}}
 .tip{position:absolute;left:-12px;top:-12px;width:24px;height:24px;border-radius:50%;border:2px solid #fff;box-shadow:0 0 10px var(--rose);opacity:0;pointer-events:none}
+.tip.down{background:#fff9;box-shadow:0 0 14px var(--rose),0 0 0 4px #ffffff66}
 .hint{position:absolute;bottom:16px;left:50%;transform:translateX(-50%);font-family:"Caveat",cursive;font-size:1.5rem;color:var(--deep);background:#fff8f3cc;padding:2px 18px;border-radius:999px;white-space:nowrap;pointer-events:none}
 .hint.top{bottom:auto;top:16px;font-family:inherit;font-size:.95rem}
 .notice{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:10px;padding:28px;background:#fff8f3ee}
