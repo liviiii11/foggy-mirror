@@ -31,3 +31,5 @@ body{font-family:"Fredoka",system-ui,sans-serif;color:var(--ink);background:radi
 .controls{display:flex;flex-wrap:wrap;gap:8px;justify-content:center}
 @media (max-width:600px){.mirror{border-width:6px;border-radius:26px}.btn{padding:8px 13px;font-size:.9rem}}
 @media (prefers-reduced-motion:reduce){*{animation:none!important}}
+/* hide water droplets*/
+.drops{display:none;position:absolute;inset:0;pointer-events:none}
