@@ -32,7 +32,7 @@ export default function HandTracker({ videoRef, active, onTip, onStatus }) {
           const v = videoRef.current;
           if (v && v.readyState >= 2 && v.currentTime !== lastTime) {
             lastTime = v.currentTime;
-            const res = landmarker.detectForVideo(v, performance.now());
+            const res = landmarker.detectForVideo(v, performance.now());  
             const L = res.landmarks?.[0];
 
             if (!L) {
@@ -42,6 +42,9 @@ export default function HandTracker({ videoRef, active, onTip, onStatus }) {
               const aspect = v.videoWidth / v.videoHeight; // x and y are normalized separately
               const dist = (a, b) => Math.hypot((a.x - b.x) * aspect, a.y - b.y);
               const ratio = dist(L[4], L[8]) / dist(L[0], L[9]); // thumb-index gap vs hand size
+              const pinchThreshold = 0.3; // empirically determined ( delete later) 
+
+
               // A finger counts as "open" when its tip is farther from the wrist than its middle joint.
               const open = (tip, pip) => dist(L[tip], L[0]) > dist(L[pip], L[0]);
               const othersOpen = [[12, 10], [16, 14], [20, 18]].filter(([t, p]) => open(t, p)).length;
